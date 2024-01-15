@@ -6,3 +6,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Subject {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  timeToEnd   Int      @map("time_to_end")
+  startAt     DateTime @map("start_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  @@map("subjects")
+}
