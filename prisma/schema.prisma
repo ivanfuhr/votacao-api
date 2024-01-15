@@ -13,26 +13,43 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  email     String   @unique
-  password  String
-  document  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String
+  email       String        @unique
+  password    String
+  document    String
+  role        Role          @default(USER)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @map("updated_at")
+  subjects    Subject[]
+  SubjectVote SubjectVote[]
 
   @@map("users")
 }
 
 model Subject {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String        @id @default(uuid()) @db.Uuid
   title       String
   description String
-  timeToEnd   Int      @map("time_to_end")
-  startAt     DateTime @map("start_at")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @default(now()) @map("updated_at")
+  timeToEnd   Int           @default(60) @map("time_to_end")
+  startAt     DateTime      @map("start_at")
+  userId      String        @map("user_id") @db.Uuid
+  user        User          @relation(fields: [userId], references: [id])
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @map("updated_at")
+  SubjectVote SubjectVote[]
 
   @@map("subjects")
+}
+
+model SubjectVote {
+  id        String   @id @default(uuid()) @db.Uuid
+  subjectId String   @map("subject_id") @db.Uuid
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("subject_votes")
 }
