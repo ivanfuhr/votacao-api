@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Global()
@@ -10,7 +11,17 @@ import { PrismaModule } from './prisma/prisma.module';
 
     // Env
     ConfigModule.forRoot(),
+
+    // JWT
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECERT'),
+        signOptions: { expiresIn: '1d' },
+      }),
+      inject: [ConfigService],
+    }),
   ],
-  exports: [ConfigModule],
+  exports: [JwtModule, ConfigModule],
 })
 export class ConfigsModule {}
