@@ -7,5 +7,6 @@ import { SubjectsService } from './subjects.service';
   controllers: [SubjectsController],
   providers: [SubjectsService],
   imports: [SubjectCategoriesModule],
+  exports: [SubjectsService],
 })
 export class SubjectsModule {}

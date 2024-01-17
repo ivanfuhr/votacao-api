@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Subject } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { SubjectCategoriesService } from '../subject-categories/subject-categories.service';
 
@@ -30,5 +30,13 @@ export class SubjectsService {
     }
 
     return this.prismaService.subject.create(params);
+  }
+
+  itsOpen(subject: Subject) {
+    const now = new Date().getTime();
+    const startTime = subject.startAt.getTime();
+    const endTime = startTime + subject.timeToEnd * 1000;
+
+    return now >= startTime && now <= endTime;
   }
 }

@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthUserRequest } from 'src/types/AuthUserRequest';
+import { AuthUserRequest } from 'src/common/types/AuthUserRequest';
 
 @Injectable()
 export class UserAdminGuard implements CanActivate {
