@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const singupUserSchema = z.object({
   name: z
-    .string()
+    .string({ required_error: 'O nome é obrigatório' })
     .min(2, {
       message: 'O nome deve ter pelo menos 2 caracteres',
     })
@@ -12,7 +12,7 @@ export const singupUserSchema = z.object({
       message: 'O nome deve ter no máximo 255 caracteres',
     }),
   email: z
-    .string()
+    .string({ required_error: 'O email é obrigatório' })
     .email({
       message: 'O email deve ser um email válido',
     })
@@ -23,7 +23,7 @@ export const singupUserSchema = z.object({
       message: 'O email deve ter no máximo 255 caracteres',
     }),
   password: z
-    .string()
+    .string({ required_error: 'A senha é obrigatória' })
     .min(8, {
       message: 'A senha deve ter pelo menos 8 caracteres',
     })
@@ -31,7 +31,7 @@ export const singupUserSchema = z.object({
       message: 'A senha deve ter no máximo 255 caracteres',
     }),
   document: z
-    .string()
+    .string({ required_error: 'O CPF é obrigatório' })
     .refine(ValidadeCpf, {
       message: 'O CPF deve ser válido',
     })

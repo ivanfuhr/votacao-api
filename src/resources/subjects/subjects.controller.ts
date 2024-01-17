@@ -6,10 +6,8 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { User } from 'src/common/decorators/user.decorator';
 import { UserAdminGuard } from 'src/common/guards/user-admin.guard';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { RequestUser } from 'src/types/AuthUserRequest';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   CreateSubjectDto,
@@ -36,10 +34,9 @@ export class SubjectsController {
   @Post('/')
   @UsePipes(new ZodValidationPipe(createSubjectSchema))
   @UseGuards(JwtAuthGuard, UserAdminGuard)
-  async create(@Body() body: CreateSubjectDto, @User() user: RequestUser) {
+  async create(@Body() body: CreateSubjectDto) {
     return this.subjectsService.create({
-      userId: user.id,
-      ...body,
+      data: body,
     });
   }
 }
