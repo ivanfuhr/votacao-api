@@ -34,6 +34,7 @@ model Subject {
   category    SubjectCategory @relation(fields: [categoryId], references: [id])
   timeToEnd   Int             @default(60) @map("time_to_end")
   startAt     DateTime        @map("start_at")
+  endAt       DateTime        @map("end_at")
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @default(now()) @map("updated_at")
   votes       SubjectVote[]

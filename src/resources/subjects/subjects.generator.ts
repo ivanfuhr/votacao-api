@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LangchainService } from 'src/common/services/langchain.service';
 import { zodToJsonSchema } from 'zod-to-json-schema';
@@ -16,10 +15,9 @@ export class SubjectsGenerator {
     private readonly langchainService: LangchainService,
     private readonly subjectCategoriesService: SubjectCategoriesService,
     private readonly subjectsService: SubjectsService,
-    private readonly configService: ConfigService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES, {
+  @Cron(CronExpression.EVERY_MINUTE, {
     disabled:
       process.env.AUTO_GENERATE_TOPICS !== 'true' ||
       !process.env.OPENAI_API_KEY,
