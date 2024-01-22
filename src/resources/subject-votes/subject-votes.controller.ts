@@ -1,8 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
-  Put,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -29,15 +30,9 @@ export class SubjectVotesController {
     });
   }
 
-  @Put('/vote')
-  @UsePipes(new ZodValidationPipe(createVoteSchema))
+  @Get('/results/:id')
   @UseGuards(JwtAuthGuard)
-  async updateVote(@Body() body: CreateVoteDto, @User() user: RequestUser) {
-    return this.subjectVotesService.update({
-      data: {
-        ...body,
-        userId: user.id,
-      },
-    });
+  async results(@Param('id') id: string) {
+    return this.subjectVotesService.results({ subjectId: id });
   }
 }

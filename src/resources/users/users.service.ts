@@ -27,7 +27,7 @@ export class UsersService {
       throw new BadRequestException('E-mail ou documento já cadastrado');
     }
 
-    return await this.prismaService.user.create({
+    return this.prismaService.user.create({
       data: {
         name,
         email,

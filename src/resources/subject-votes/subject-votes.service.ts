@@ -11,13 +11,13 @@ export class SubjectVotesService {
   ) {}
 
   private async validadeSubject(subjectId: string) {
-    const subjectExists = await this.subjectsService.findOne(subjectId);
+    const subjectExists = await this.subjectsService.findOne({ id: subjectId });
 
     if (!subjectExists) {
       throw new BadRequestException('Pauta não encontrada');
     }
 
-    if (!this.subjectsService.itsOpen(subjectExists)) {
+    if (subjectExists.endAt < new Date()) {
       throw new BadRequestException('Pauta não está aberta para votação');
     }
   }
@@ -41,29 +41,30 @@ export class SubjectVotesService {
     return this.prismaService.subjectVote.create(params);
   }
 
-  async update(params: { data: Prisma.SubjectVoteUncheckedCreateInput }) {
-    const { data } = params;
-
-    await this.validadeSubject(data.subjectId);
-
-    const userVotedOnSubject = await this.prismaService.subjectVote.findFirst({
+  async results({ subjectId }: { subjectId: string }) {
+    const votes = await this.prismaService.subjectVote.findMany({
       where: {
-        subjectId: data.subjectId,
-        userId: data.userId,
+        subjectId,
+      },
+      select: {
+        type: true,
       },
     });
 
-    if (!userVotedOnSubject) {
-      throw new BadRequestException('Você ainda não votou nesta pauta');
-    }
+    const totalVotes = votes.length;
 
-    return this.prismaService.subjectVote.update({
-      where: {
-        id: userVotedOnSubject.id,
-      },
-      data: {
-        type: data.type,
-      },
-    });
+    const votesYes = votes.filter((vote) => vote.type === 'YES').length;
+    const votesNo = votes.filter((vote) => vote.type === 'NO').length;
+
+    const percentVotesYes = (votesYes / totalVotes) * 100;
+    const percentVotesNo = (votesNo / totalVotes) * 100;
+
+    return {
+      totalVotes,
+      votesYes,
+      votesNo,
+      percentVotesYes,
+      percentVotesNo,
+    };
   }
 }

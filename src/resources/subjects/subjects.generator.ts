@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { LangchainService } from 'src/common/services/langchain.service';
+import { LangchainService } from 'src/common/services/langchain/langchain.service';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { SubjectCategoriesService } from '../subject-categories/subject-categories.service';
 import {

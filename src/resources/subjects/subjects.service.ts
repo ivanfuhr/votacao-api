@@ -11,27 +11,95 @@ export class SubjectsService {
     private readonly subjectCategoriesService: SubjectCategoriesService,
   ) {}
 
-  async findAll() {
+  async findAll({ userId }: { userId?: string }) {
     return this.prismaService.subject.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startAt: true,
+        endAt: true,
+        timeToEnd: true,
         category: {
           select: {
             id: true,
             title: true,
           },
         },
+        votes: {
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+            type: true,
+          },
+        },
+      },
+      where: {
+        endAt: {
+          gte: new Date(),
+        },
       },
     });
   }
 
-  async findOne(id: string) {
+  async findOne({ id, userId }: { id: string; userId?: string }) {
     return this.prismaService.subject.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startAt: true,
+        endAt: true,
+        timeToEnd: true,
         category: {
           select: {
             id: true,
             title: true,
+          },
+        },
+        votes: {
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+            type: true,
+          },
+        },
+      },
+    });
+  }
+
+  async myVotes({ userId }: { userId: string }) {
+    return this.prismaService.subject.findMany({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startAt: true,
+        endAt: true,
+        timeToEnd: true,
+        category: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        votes: {
+          select: {
+            id: true,
+            userId: true,
+            type: true,
+          },
+        },
+      },
+      where: {
+        votes: {
+          some: {
+            userId,
           },
         },
       },

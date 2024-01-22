@@ -10,6 +10,12 @@ export class UsersController {
   @Post('singup')
   @UsePipes(new ZodValidationPipe(singupUserSchema))
   async singup(@Body() body: SingupUserDto) {
-    return await this.usersService.create(body);
+    const response = await this.usersService.create(body);
+
+    return {
+      name: response.name,
+      email: response.email,
+      document: response.document,
+    };
   }
 }

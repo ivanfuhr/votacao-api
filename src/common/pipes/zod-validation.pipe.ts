@@ -4,6 +4,7 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { ZodError, ZodSchema } from 'zod';
+import { zodErrorResponse } from '../helpers/zod-error-response';
 
 export class ZodValidationPipe implements PipeTransform {
   constructor(private schema: ZodSchema) {}
@@ -18,15 +19,7 @@ export class ZodValidationPipe implements PipeTransform {
       return parsedValue;
     } catch (error: any) {
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((e) => e.message);
-
-        const combinedErrorMessage = errorMessages.join(', ');
-
-        throw new BadRequestException(
-          combinedErrorMessage !== 'Invalid input'
-            ? combinedErrorMessage
-            : 'A validação falhou',
-        );
+        zodErrorResponse(error);
       }
 
       throw new BadRequestException('Erro desconhecido durante a validação');

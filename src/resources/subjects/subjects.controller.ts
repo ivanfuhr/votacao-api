@@ -2,12 +2,15 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { User } from 'src/common/decorators/user.decorator';
 import { UserAdminGuard } from 'src/common/guards/user-admin.guard';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { RequestUser } from 'src/common/types/AuthUserRequest';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   CreateSubjectDto,
@@ -21,14 +24,22 @@ export class SubjectsController {
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  async findAll() {
-    return this.subjectsService.findAll();
+  async findAll(@User() user: RequestUser) {
+    return this.subjectsService.findAll({
+      userId: user.id,
+    });
+  }
+
+  @Get('/my-votes')
+  @UseGuards(JwtAuthGuard)
+  async myVotes(@User() user: RequestUser) {
+    return this.subjectsService.myVotes({ userId: user.id });
   }
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  async findOne(id: string) {
-    return this.subjectsService.findOne(id);
+  async findOne(@Param('id') id: string, @User() user: RequestUser) {
+    return this.subjectsService.findOne({ id, userId: user.id });
   }
 
   @Post('/')
