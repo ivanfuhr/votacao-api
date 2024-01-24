@@ -17,7 +17,7 @@ export class SubjectsGenerator {
     private readonly subjectsService: SubjectsService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE, {
+  @Cron(CronExpression.EVERY_10_MINUTES, {
     disabled:
       process.env.AUTO_GENERATE_TOPICS !== 'true' ||
       !process.env.OPENAI_API_KEY,
@@ -40,8 +40,8 @@ export class SubjectsGenerator {
 
     const { title, description } = response;
 
-    const minTimeToEndInSeconds = 30; // 30 segundos
-    const maxTimeToEndInSeconds = 600; // 10 minutos
+    const minTimeToEndInSeconds = 60 * 30; // 30 minutos
+    const maxTimeToEndInSeconds = 60 * 60 * 2; // 2 horas
 
     const randomTimeToEnd = Math.floor(
       Math.random() * (maxTimeToEndInSeconds - minTimeToEndInSeconds) +
@@ -61,6 +61,10 @@ export class SubjectsGenerator {
 
   private async getRandomCategory() {
     const categories = await this.subjectCategoriesService.findAll();
+
+    if (!categories.length) {
+      throw new Error('Não existem categorias cadastradas');
+    }
 
     const randomIndex = Math.floor(Math.random() * categories.length);
     return categories[randomIndex];

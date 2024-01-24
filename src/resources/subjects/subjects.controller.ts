@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
+  Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -23,23 +26,33 @@ export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @Get('/')
-  @UseGuards(JwtAuthGuard)
-  async findAll(@User() user: RequestUser) {
-    return this.subjectsService.findAll({
-      userId: user.id,
+  async findAll(
+    @User() user?: RequestUser,
+    @Query('page') page = 1,
+    @Query('categoryId') categoryId?: string,
+  ) {
+    return this.subjectsService.findAllActive({
+      page,
+      userId: user?.id,
+      categoryId,
     });
+  }
+
+  @Get('/all')
+  @UseGuards(JwtAuthGuard, UserAdminGuard)
+  async findAllAdmin(@Query('page') page = 1) {
+    return this.subjectsService.findAll({ page });
   }
 
   @Get('/my-votes')
   @UseGuards(JwtAuthGuard)
-  async myVotes(@User() user: RequestUser) {
-    return this.subjectsService.myVotes({ userId: user.id });
+  async myVotes(@User() user: RequestUser, @Query('page') page = 1) {
+    return this.subjectsService.findByUserVotes({ userId: user.id, page });
   }
 
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id') id: string, @User() user: RequestUser) {
-    return this.subjectsService.findOne({ id, userId: user.id });
+  async findOne(@Param('id') id: string, @User() user?: RequestUser) {
+    return this.subjectsService.findOne({ id, userId: user?.id });
   }
 
   @Post('/')
@@ -49,5 +62,21 @@ export class SubjectsController {
     return this.subjectsService.create({
       data: body,
     });
+  }
+
+  @Put('/:id')
+  @UsePipes(new ZodValidationPipe(createSubjectSchema))
+  @UseGuards(JwtAuthGuard, UserAdminGuard)
+  async update(@Param('id') id: string, @Body() body: CreateSubjectDto) {
+    return this.subjectsService.update({
+      id,
+      data: body,
+    });
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard, UserAdminGuard)
+  async delete(@Param('id') id: string) {
+    return this.subjectsService.delete({ id });
   }
 }

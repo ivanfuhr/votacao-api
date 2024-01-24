@@ -9,8 +9,13 @@ export const createSubjectSchema = z.object({
     .max(255, {
       message: 'O título deve ter no máximo 255 caracteres',
     }),
-  description: z.string({ required_error: 'A descrição é obrigatória' }),
-  timeToEnd: z
+  description: z
+    .string({ required_error: 'A descrição é obrigatória' })
+    .min(2, {
+      message: 'A descrição deve ter pelo menos 2 caracteres',
+    }),
+
+  timeToEnd: z.coerce
     .number({ required_error: 'O tempo para terminar é obrigatório' })
     .positive({
       message: 'O tempo para terminar deve ser um número positivo',

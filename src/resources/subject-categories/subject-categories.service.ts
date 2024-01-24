@@ -17,4 +17,22 @@ export class SubjectCategoriesService {
   create(params: { data: Prisma.SubjectCategoryUncheckedCreateInput }) {
     return this.prismaService.subjectCategory.create(params);
   }
+
+  update(params: {
+    id: string;
+    data: Prisma.SubjectCategoryUncheckedUpdateInput;
+  }) {
+    return this.prismaService.subjectCategory.update({
+      where: { id: params.id },
+      data: params.data,
+    });
+  }
+
+  async delete(id: string) {
+    await this.prismaService.subject.deleteMany({
+      where: { categoryId: id },
+    });
+
+    return this.prismaService.subjectCategory.delete({ where: { id } });
+  }
 }

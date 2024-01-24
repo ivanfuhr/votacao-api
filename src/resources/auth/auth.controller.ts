@@ -17,6 +17,7 @@ export class AuthController {
         name: req.user.name,
         email: req.user.email,
         document: req.user.document,
+        role: req.user.role,
       },
     };
   }
@@ -30,6 +31,7 @@ export class AuthController {
         name: req.user.name,
         email: req.user.email,
         document: req.user.document,
+        role: req.user.role,
       },
     };
   }
