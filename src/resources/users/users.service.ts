@@ -16,27 +16,34 @@ export class UsersService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    const userExists = await this.prismaService.user.findFirst({
-      where: {
-        isDefault: true,
-      },
-    });
-
-    if (!userExists) {
-      const response = await this.prismaService.user.create({
-        data: {
-          name: 'Admin',
-          email: 'admin@admin.com',
-          password: await bcrypt.hash('admin', 10),
-          document: '000.000.000-00',
-          role: 'ADMIN',
+    try {
+      const userExists = await this.prismaService.user.findFirst({
+        where: {
           isDefault: true,
         },
       });
 
-      console.log('Usuário padrão criado');
+      if (!userExists) {
+        const response = await this.prismaService.user.create({
+          data: {
+            name: 'Admin',
+            email: 'admin@admin.com',
+            password: await bcrypt.hash('admin', 10),
+            document: '000.000.000-00',
+            role: 'ADMIN',
+            isDefault: true,
+          },
+        });
+
+        console.log('Usuário padrão criado');
+        console.log(
+          `Dados de acesso:\n\nDocumento: ${response.document}\nSenha: admin`,
+        );
+      }
+    } catch (error) {
       console.log(
-        `Dados de acesso:\n\nDocumento: ${response.document}\nSenha: admin`,
+        'Erro ao criar usuário padrão, verifique o erro abaixo:',
+        error,
       );
     }
   }
