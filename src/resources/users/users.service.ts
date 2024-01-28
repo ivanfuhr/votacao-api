@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PaginateFunction, paginator } from 'src/common/helpers/paginator';
-import { PrismaService } from 'src/config/prisma/prisma.service';
+import { PaginateFunction, paginator } from '../../common/helpers/paginator';
+import { PrismaService } from '../../config/prisma/prisma.service';
 import { UpdateUserDto } from './schemas/update-user.schema';
 
 @Injectable()

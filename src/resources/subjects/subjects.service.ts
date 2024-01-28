@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Subject } from '@prisma/client';
-import { PaginateFunction, paginator } from 'src/common/helpers/paginator';
-import { PrismaService } from 'src/config/prisma/prisma.service';
+import { PaginateFunction, paginator } from '../../common/helpers/paginator';
+import { PrismaService } from '../../config/prisma/prisma.service';
 import { SubjectCategoriesService } from '../subject-categories/subject-categories.service';
 import { UsersService } from '../users/users.service';
 import { CreateSubjectDto } from './schemas/create-subject.schema';

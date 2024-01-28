@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/config/prisma/prisma.service';
+import { PrismaService } from '../../config/prisma/prisma.service';
 
 @Injectable()
 export class SubjectCategoriesService {
@@ -10,8 +10,8 @@ export class SubjectCategoriesService {
     return this.prismaService.subjectCategory.findMany();
   }
 
-  findOne(id: string) {
-    const result = this.prismaService.subjectCategory.findUnique({
+  async findOne(id: string) {
+    const result = await this.prismaService.subjectCategory.findUnique({
       where: { id },
     });
 
