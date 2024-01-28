@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { SubjectsService } from '../subjects/subjects.service';
@@ -10,22 +14,20 @@ export class SubjectVotesService {
     private readonly subjectsService: SubjectsService,
   ) {}
 
-  private async validadeSubject(subjectId: string) {
-    const subjectExists = await this.subjectsService.findOne({ id: subjectId });
+  async create(params: { data: Prisma.SubjectVoteUncheckedCreateInput }) {
+    const { data } = params;
+
+    const subjectExists = await this.subjectsService.findOne({
+      id: data.subjectId,
+    });
 
     if (!subjectExists) {
-      throw new BadRequestException('Pauta não encontrada');
+      throw new NotFoundException('Pauta não encontrada');
     }
 
     if (subjectExists.endAt < new Date()) {
       throw new BadRequestException('Pauta não está aberta para votação');
     }
-  }
-
-  async create(params: { data: Prisma.SubjectVoteUncheckedCreateInput }) {
-    const { data } = params;
-
-    await this.validadeSubject(data.subjectId);
 
     const userVotedOnSubject = await this.prismaService.subjectVote.findFirst({
       where: {
@@ -42,6 +44,14 @@ export class SubjectVotesService {
   }
 
   async results({ subjectId }: { subjectId: string }) {
+    const subjectExists = await this.subjectsService.findOne({
+      id: subjectId,
+    });
+
+    if (!subjectExists) {
+      throw new NotFoundException('Pauta não encontrada');
+    }
+
     const votes = await this.prismaService.subjectVote.findMany({
       where: {
         subjectId,

@@ -45,4 +45,4 @@ COPY --from=builder /usr/src/app/.env ./
 EXPOSE 3000
 
 # Executar a aplicação
-CMD ["node", "dist/main"]
+CMD ["pnpm", "start:migrate:prod"]

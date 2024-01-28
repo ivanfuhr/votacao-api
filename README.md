@@ -41,3 +41,8 @@ Na primeira execução da aplicação, um usuário padrão com privilégios de a
 Este projeto conta com um módulo de criação automática de pautas, alimentado por IA.
 Para ativar o módulo será necessário uma chave de API da OpenAI, que deve ser definida no variavel ambiente
 OPENAI_API_KEY, e também definir como `true` a variavel AUTO_GENERATE_TOPICS
+
+## Documentação
+
+Você pode encontrar todas as rotas da API no arquivo doc.json, para abrir esse arquivo você precisa fazer o
+download do software [Insomnia] (https://insomnia.rest/download) e então importar o mesmo!

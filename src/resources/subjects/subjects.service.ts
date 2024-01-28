@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Subject } from '@prisma/client';
 import { PaginateFunction, paginator } from 'src/common/helpers/paginator';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { SubjectCategoriesService } from '../subject-categories/subject-categories.service';
+import { UsersService } from '../users/users.service';
 import { CreateSubjectDto } from './schemas/create-subject.schema';
 
 @Injectable()
@@ -12,6 +17,7 @@ export class SubjectsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly subjectCategoriesService: SubjectCategoriesService,
+    private readonly usersService: UsersService,
   ) {
     this.paginate = paginator({
       perPage: 10,
@@ -27,6 +33,14 @@ export class SubjectsService {
     page: number;
     categoryId?: string;
   }) {
+    if (categoryId) {
+      await this.subjectCategoriesService.findOne(categoryId);
+    }
+
+    if (userId) {
+      await this.usersService.findById(userId);
+    }
+
     return this.paginate<Subject, any>(
       this.prismaService.subject,
       {
@@ -94,7 +108,11 @@ export class SubjectsService {
   }
 
   async findOne({ id, userId }: { id: string; userId?: string }) {
-    return this.prismaService.subject.findUnique({
+    if (userId) {
+      await this.usersService.findById(userId);
+    }
+
+    const subject = this.prismaService.subject.findUnique({
       where: { id },
       select: {
         id: true,
@@ -120,9 +138,19 @@ export class SubjectsService {
         },
       },
     });
+
+    if (!subject) {
+      throw new NotFoundException('Pauta não encontrada');
+    }
+
+    return subject;
   }
 
   async findByUserVotes({ userId, page }: { userId: string; page: number }) {
+    if (userId) {
+      await this.usersService.findById(userId);
+    }
+
     return this.paginate<Subject, any>(
       this.prismaService.subject,
       {
@@ -186,13 +214,8 @@ export class SubjectsService {
   async update(params: { id: string; data: CreateSubjectDto }) {
     const { id, data } = params;
 
-    const categoryExists = await this.subjectCategoriesService.findOne(
-      data.categoryId,
-    );
-
-    if (!categoryExists) {
-      throw new BadRequestException('Categoria não encontrada');
-    }
+    await this.subjectCategoriesService.findOne(data.categoryId);
+    await this.findOne({ id });
 
     const endAt = this.calculeEndAt(data.startAt, data.timeToEnd);
 
@@ -207,6 +230,8 @@ export class SubjectsService {
 
   async delete(params: { id: string }) {
     const { id } = params;
+
+    await this.findOne({ id });
 
     await this.prismaService.subjectVote.deleteMany({
       where: {

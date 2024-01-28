@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PaginateFunction, paginator } from 'src/common/helpers/paginator';
@@ -80,19 +85,31 @@ export class UsersService implements OnModuleInit {
   }
 
   async findByDocument(document: string) {
-    return await this.prismaService.user.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: {
         document,
       },
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
   async findById(id: string) {
-    return await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id,
       },
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
   async findAll({ page }: { page: number }) {
@@ -114,7 +131,7 @@ export class UsersService implements OnModuleInit {
   }
 
   async findByIdWeb(id: string) {
-    return await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id,
       },
@@ -128,6 +145,12 @@ export class UsersService implements OnModuleInit {
         updatedAt: true,
       },
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
   async update({ id, data }: { id: string; data: UpdateUserDto }) {
@@ -140,7 +163,7 @@ export class UsersService implements OnModuleInit {
     });
 
     if (!userExists) {
-      throw new BadRequestException('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     if (userExists.isDefault && role !== 'ADMIN') {
@@ -189,7 +212,7 @@ export class UsersService implements OnModuleInit {
     });
 
     if (!userExists) {
-      throw new BadRequestException('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     if (userExists.isDefault) {

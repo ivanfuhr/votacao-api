@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 
@@ -11,7 +11,15 @@ export class SubjectCategoriesService {
   }
 
   findOne(id: string) {
-    return this.prismaService.subjectCategory.findUnique({ where: { id } });
+    const result = this.prismaService.subjectCategory.findUnique({
+      where: { id },
+    });
+
+    if (!result) {
+      throw new NotFoundException(`Categoria não encontrada!`);
+    }
+
+    return result;
   }
 
   create(params: { data: Prisma.SubjectCategoryUncheckedCreateInput }) {
@@ -22,6 +30,14 @@ export class SubjectCategoriesService {
     id: string;
     data: Prisma.SubjectCategoryUncheckedUpdateInput;
   }) {
+    const category = this.prismaService.subjectCategory.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Categoria não encontrada!`);
+    }
+
     return this.prismaService.subjectCategory.update({
       where: { id: params.id },
       data: params.data,
@@ -29,6 +45,14 @@ export class SubjectCategoriesService {
   }
 
   async delete(id: string) {
+    const category = await this.prismaService.subjectCategory.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Categoria não encontrada!`);
+    }
+
     await this.prismaService.subject.deleteMany({
       where: { categoryId: id },
     });
