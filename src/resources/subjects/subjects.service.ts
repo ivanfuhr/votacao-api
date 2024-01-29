@@ -65,6 +65,9 @@ export class SubjectsService {
         },
         where: {
           categoryId,
+          startAt: {
+            lte: new Date(),
+          },
           endAt: {
             gte: new Date(),
           },
