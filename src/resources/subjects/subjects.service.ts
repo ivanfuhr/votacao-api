@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Subject } from '@prisma/client';
 import { PaginateFunction, paginator } from '../../common/helpers/paginator';
 import { PrismaService } from '../../config/prisma/prisma.service';
@@ -112,7 +108,7 @@ export class SubjectsService {
       await this.usersService.findById(userId);
     }
 
-    const subject = this.prismaService.subject.findUnique({
+    const subject = await this.prismaService.subject.findUnique({
       where: { id },
       select: {
         id: true,
@@ -147,9 +143,7 @@ export class SubjectsService {
   }
 
   async findByUserVotes({ userId, page }: { userId: string; page: number }) {
-    if (userId) {
-      await this.usersService.findById(userId);
-    }
+    await this.usersService.findById(userId);
 
     return this.paginate<Subject, any>(
       this.prismaService.subject,
@@ -193,13 +187,7 @@ export class SubjectsService {
   async create(params: { data: CreateSubjectDto }) {
     const { data } = params;
 
-    const categoryExists = await this.subjectCategoriesService.findOne(
-      data.categoryId,
-    );
-
-    if (!categoryExists) {
-      throw new BadRequestException('Categoria não encontrada');
-    }
+    await this.subjectCategoriesService.findOne(data.categoryId);
 
     const endAt = this.calculeEndAt(data.startAt, data.timeToEnd);
 

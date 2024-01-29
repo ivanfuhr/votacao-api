@@ -140,6 +140,7 @@ export class UsersService implements OnModuleInit {
         name: true,
         email: true,
         document: true,
+        password: false,
         role: true,
         createdAt: true,
         updatedAt: true,

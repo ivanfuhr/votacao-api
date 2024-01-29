@@ -26,11 +26,11 @@ export class SubjectCategoriesService {
     return this.prismaService.subjectCategory.create(params);
   }
 
-  update(params: {
+  async update(params: {
     id: string;
     data: Prisma.SubjectCategoryUncheckedUpdateInput;
   }) {
-    const category = this.prismaService.subjectCategory.findUnique({
+    const category = await this.prismaService.subjectCategory.findUnique({
       where: { id: params.id },
     });
 

@@ -21,10 +21,6 @@ export class SubjectVotesService {
       id: data.subjectId,
     });
 
-    if (!subjectExists) {
-      throw new NotFoundException('Pauta não encontrada');
-    }
-
     if (subjectExists.endAt < new Date()) {
       throw new BadRequestException('Pauta não está aberta para votação');
     }
