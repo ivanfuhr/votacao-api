@@ -37,7 +37,24 @@ export class SubjectsService {
       await this.usersService.findById(userId);
     }
 
-    return this.paginate<Subject, any>(
+    const response = await this.paginate<
+      {
+        id: string;
+        title: string;
+        votes: {
+          id: string;
+        }[];
+        description: string;
+        timeToEnd: number;
+        startAt: Date;
+        endAt: Date;
+        category: {
+          id: string;
+          title: string;
+        };
+      },
+      any
+    >(
       this.prismaService.subject,
       {
         select: {
@@ -78,6 +95,15 @@ export class SubjectsService {
       },
       { page },
     );
+
+    if (!userId) {
+      response.data = response.data.map((subject) => {
+        subject.votes = [];
+        return subject;
+      });
+    }
+
+    return response;
   }
 
   async findAll({ page }: { page: number }) {
